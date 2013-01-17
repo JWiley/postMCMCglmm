@@ -138,6 +138,9 @@ predict2.MCMCglmm <- function(object, X, Z, use = c("all", "mean"),
 #'   meant for discrete predictors rather than continuous ones.
 #' @param \dots Passed on to \code{predict2}
 #' @seealso \code{\link{summary.MCMCglmmPredictedProbs}}, \code{\link{predict2.MCMCglmm}}
+#' @return A list of class \code{MCMCglmmPredictedProbs} that are the differences
+#'   in predicted probabilities for a one unit change (calculated from the
+#'   twiddle value or between the discrete values supplied in \code{values}).
 #' @export
 #' @examples
 #' \dontrun{

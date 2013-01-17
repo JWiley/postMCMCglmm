@@ -10,7 +10,8 @@ Depends:
     R (>= 2.15.2),
     methods,
     stats,
-    MCMCglmm (>= 2.17)
+    MCMCglmm (>= 2.17),
+    coda (>= 0.16-1)
 Imports:
     ggplot2 (>= 0.9.3), grid, nlme, emdbook
 Description: R package to support Modern Modeling Methods presentation on using

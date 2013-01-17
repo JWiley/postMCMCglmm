@@ -1,11 +1,25 @@
-# summary method for predicted probabilities
-# optionally first marginalizes across all observations
-# by taking the row means
-# If the predicted values only used the posterior means
-# cannot generate intervals, so only the means are returned
-# otherwise, calculates the mean predicted probability, as well as
-# the HPD interval
-# this can either be per observation or marginalized
+#' Summary method for MCMCglmm predicted probabilities
+#'
+#' Optionally first marginalizes across all observations
+#' by taking the row means. If the predicted values only used the posterior means,
+#' highest posterior density (HPD) intervals cannot be generated, so only
+#' the means are returned. Otherwise, it calculates the mean predicted probability,
+#' as well as the HPD interval. This can either be per observation or marginalized.
+#'
+#' @param object A \code{MCMCglmmPredictedProbs} object to summarize
+#' @param marginalize Logical whether or not to marginalize by taking the row means. Defaults to \code{FALSE}.
+#' @param level A numeric value, the value to use when calculating HPD intervals. Defaults to .95.
+#' @param \dots Not currently used.
+#' @return If HPD intervals are calculated, returns a list of matrices
+#'   with the means, lower limit, and upper limit. If no HPD intervals
+#'   are calculated, returns a list of means.
+#' @method summary MCMCglmmPredictedProbs
+#' @export
+#' @seealso \code{\link{predict2.MCMCglmm}}, \code{\link{recycler}}
+#' @examples
+#' \dontrun{
+#'   ## Make me!
+#' }
 summary.MCMCglmmPredictedProbs <- function(object,
   marginalize = FALSE, level = .95, ...) {
 
@@ -44,23 +58,54 @@ confusion <- function(formula, data) {
 }
 
 
-# @importFrom grid unit grid.newpage pushViewport viewport grid.layout
-# @importFrom emdbook HPDregionplot
-# @examples
-# sample data
-# set.seed(10)
-# dens2dtestdat <- as.data.frame(MASS::mvrnorm(4500, c(b1 = -.1, b2 = .05),
-#   Sigma = c(.05, .02)*matrix(c(1, -.5, -.5, 1), 2)*rep(c(.05, .02), each = 2)))
-# d <- as.data.frame(mar2c$Sol[, 10:11]); colnames(d) <- c("b1", "b2")
-# tmp <- as.data.frame(HPDregionplot(as.mcmc(d), n = 200)[[1]])
-# my2d(d, x = "b1", y = "b2", tmp, xlab = "Reactivity x Support", ylab = "Recovery x Support")
-
-# make the plot
-# my2d(dens2dtestdat, x = "b1", y = "b2", xlab = "Time x Constraint",
-#   ylab = bquote(Time^2 ~ x ~ Constraint))
-# clean up
-# rm(dens2dtestdat)
-my2d <- function(dat, x, y, xlab = "", ylab = "",
+#' Plot the joint posterior from an MCMC
+#'
+#' A function to calculate the HPD region for a joint posterior,
+#' and plot the bivariate density with HPD region, and univariate
+#' densities on the margins using the \pkg{ggplot2} package.
+#'
+#' @param dat A data frame, typically of MCMC posterior samples.
+#' @param x A character string of the variable in \code{dat} to plot on
+#'   the x-axis.
+#' @param y A character string of the variable in \code{dat} to plot on
+#'   the y-axis.
+#' @param xlab A character string or expression containing the
+#'   x-axis label. Expressions may be used for Greek or mathematical
+#'   symbols. Defaults to blank.
+#' @param ylab A character string or expression containing the
+#'   x-axis label. Expressions may be used for Greek or mathematical
+#'   symbols. Defaults to blank.
+#' @param probs A numeric value of the probability to use for calculating
+#'   the HPD region for the two dimensional density plot. Passed to
+#'   \code{HPDregionplot} from the \pkg{emdbook} package.
+#' @param plot A logical whether the graph should be plotted or not.
+#'   Defaults to \code{TRUE}.
+#' @param topleftmargin A numeric value of the left margin of the
+#'   upper univariate density plot. Need to adjust this to get the
+#'   upper univariate density to line up with the bivariate density
+#'   plot.
+#' @return An invisible list of the univariate and bivariate density plots
+#'   and the viewport used to put them all together. Primarily called for the
+#'   side effect of creating a graph.
+#' @importFrom grid unit grid.newpage pushViewport viewport grid.layout
+#' @importFrom emdbook HPDregionplot
+#' @examples
+#' \dontrun{
+#'   # sample data
+#'   set.seed(10)
+#'   dens2dtestdat <- as.data.frame(MASS::mvrnorm(4500, c(b1 = -.1, b2 = .05),
+#'     Sigma = c(.05, .02)*matrix(c(1, -.5, -.5, 1), 2)*rep(c(.05, .02), each = 2)))
+#'   d <- as.data.frame(mar2c$Sol[, 10:11]); colnames(d) <- c("b1", "b2")
+#'   tmp <- as.data.frame(HPDregionplot(as.mcmc(d), n = 200)[[1]])
+#'   jointPosterior(d, x = "b1", y = "b2", tmp, xlab = "Reactivity x Support", ylab = "Recovery x Support")
+#'
+#'   # make the plot
+#'   jointPosterior(dens2dtestdat, x = "b1", y = "b2", xlab = "Time x Constraint",
+#'     ylab = bquote(Time^2 ~ x ~ Constraint))
+#'   # clean up
+#'   rm(dens2dtestdat)
+#' }
+jointPosterior <- function(dat, x, y, xlab = "", ylab = "",
   probs = .95, plot=TRUE, topleftmargin = .2) {
 
   dat <- dat[, c(x, y)]
