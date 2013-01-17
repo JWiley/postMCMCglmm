@@ -21,6 +21,7 @@
 #' @docType package
 #' @title Post Estimation for MCMCglmm
 #' @keywords package
+#' @import ggplot2
 #' @examples
 #' \dontrun{
 #'   # fill me in!!

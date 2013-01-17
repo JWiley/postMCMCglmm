@@ -12,7 +12,7 @@ Depends:
     stats,
     MCMCglmm
 Imports:
-    nlme
+    ggplot2, grid, nlme
 Description: R package to support Modern Modeling Methods presentation on using
     average marginal predicted probabilities as an intuitive way to present
     results from a Bayesian cross classified hierarchical ordered probit model.
