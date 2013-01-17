@@ -9,7 +9,7 @@
 #'   \item{fixed}{A character vector of the fixed effects parameter names}
 #'   \item{random}{A character vector of the random effects parameter names}
 #' @export
-#' @seealso \code{\link{fixef.MCMCglmm}} \code{\link{ranef.MCMCglmm}}
+#' @seealso \code{\link{fixef.MCMCglmm}}, \code{\link{ranef.MCMCglmm}}
 #' @examples
 #' \dontrun{
 #'   # a simple MCMCglmm model
@@ -41,7 +41,7 @@ paramNamesMCMCglmm <- function(object, ...) {
 #' @param data The dataset used for the model
 #' @param \dots Not currently used
 #' @export
-#' @seealso \code{\link{paramNamesMCMCglmm}} \code{\link{ranef.MCMCglmm}}
+#' @seealso \code{\link{paramNamesMCMCglmm}}, \code{\link{ranef.MCMCglmm}}
 #' @examples
 #' \dontrun{
 #'   # a simple MCMCglmm model
@@ -75,7 +75,7 @@ ranefLevels <- function(object, data, ...) {
 #' @param \dots Not currently used.
 #' @return A matrix of the posterior samples or means for the fixed or random effects.
 #' @keywords internal
-#' @seealso \code{\link{fixef.MCMCglmm}} \code{\link{ranef.MCMCglmm}}
+#' @seealso \code{\link{fixef.MCMCglmm}}, \code{\link{ranef.MCMCglmm}}
 #' @rdname extractEffects
 .extractEffects <- function(object, use = c("all", "mean"),
   which = c("fixed", "random"), ...) {
@@ -123,7 +123,9 @@ ranefLevels <- function(object, data, ...) {
 #' @param \dots Arguments passed on to the worker function.
 #' @return A matrix of the fixed effects
 #' @importFrom nlme fixef
-#' @S3method fixef MCMCglmm
+#' @method fixef MCMCglmm
+#' @export
+#' @export fixef
 #' @seealso \code{\link{ranef.MCMCglmm}}
 #' @examples
 #' \dontrun{
@@ -156,7 +158,9 @@ fixef.MCMCglmm <- function(object, use = c("all", "mean"), ...) {
 #' @param \dots Arguments passed on to the worker function.
 #' @return A matrix of the fixed effects
 #' @importFrom nlme ranef
-#' @S3method ranef MCMCglmm
+#' @method ranef MCMCglmm
+#' @export
+#' @export ranef
 #' @seealso \code{\link{fixef.MCMCglmm}}
 #' @examples
 #' \dontrun{

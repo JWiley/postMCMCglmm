@@ -29,6 +29,7 @@
 }
 }
 \seealso{
-  \code{\link{fixef.MCMCglmm}} \code{\link{ranef.MCMCglmm}}
+  \code{\link{fixef.MCMCglmm}},
+  \code{\link{ranef.MCMCglmm}}
 }
 

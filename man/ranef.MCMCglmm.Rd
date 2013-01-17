@@ -2,7 +2,8 @@
 \alias{ranef.MCMCglmm}
 \title{Extract random effects from an \code{MCMCglmm} object}
 \usage{
-  ranef.MCMCglmm(object, use = c("all", "mean"), ...)
+  \method{ranef}{MCMCglmm} (object, use = c("all", "mean"),
+    ...)
 }
 \arguments{
   \item{object}{An \code{MCMCglmm} model object to extract

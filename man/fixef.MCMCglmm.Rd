@@ -2,7 +2,8 @@
 \alias{fixef.MCMCglmm}
 \title{Extract fixed effects from an \code{MCMCglmm} object}
 \usage{
-  fixef.MCMCglmm(object, use = c("all", "mean"), ...)
+  \method{fixef}{MCMCglmm} (object, use = c("all", "mean"),
+    ...)
 }
 \arguments{
   \item{object}{An \code{MCMCglmm} model object to extract

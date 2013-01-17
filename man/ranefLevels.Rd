@@ -26,7 +26,7 @@
 }
 }
 \seealso{
-  \code{\link{paramNamesMCMCglmm}}
+  \code{\link{paramNamesMCMCglmm}},
   \code{\link{ranef.MCMCglmm}}
 }
 

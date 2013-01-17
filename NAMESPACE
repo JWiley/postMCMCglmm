@@ -1,4 +1,6 @@
+export(fixef)
 export(paramNamesMCMCglmm)
+export(ranef)
 export(ranefLevels)
 importFrom(nlme,fixef)
 importFrom(nlme,ranef)

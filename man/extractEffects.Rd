@@ -30,7 +30,8 @@
   the posterior mean or all the posterior samples.
 }
 \seealso{
-  \code{\link{fixef.MCMCglmm}} \code{\link{ranef.MCMCglmm}}
+  \code{\link{fixef.MCMCglmm}},
+  \code{\link{ranef.MCMCglmm}}
 }
 \keyword{internal}
 
