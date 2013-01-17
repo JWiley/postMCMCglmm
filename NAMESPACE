@@ -1,2 +1,6 @@
-## import all packages or functions used in any of my functions
-import(MCMCglmm)
+export(paramNamesMCMCglmm)
+export(ranefLevels)
+importFrom(nlme,fixef)
+importFrom(nlme,ranef)
+S3method(fixef,MCMCglmm)
+S3method(ranef,MCMCglmm)

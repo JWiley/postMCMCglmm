@@ -1,0 +1,32 @@
+\name{ranefLevels}
+\alias{ranefLevels}
+\title{Extract the levels of factors used for random effects in \code{MCMCglmm} objects}
+\usage{
+  ranefLevels(object, data, ...)
+}
+\arguments{
+  \item{object}{An \code{MCMCglmm} model object}
+
+  \item{data}{The dataset used for the model}
+
+  \item{\dots}{Not currently used}
+}
+\description{
+  Extract the levels of factors used for random effects in
+  \code{MCMCglmm} objects
+}
+\examples{
+\dontrun{
+  # a simple MCMCglmm model
+  data(PlodiaPO)
+  m <- MCMCglmm(PO ~ 1, random = ~ FSfamily, data = PlodiaPO, verbose=FALSE)
+
+  # extract the random effects levels
+  ranefLevels(m, PlodiaPO)
+}
+}
+\seealso{
+  \code{\link{paramNamesMCMCglmm}}
+  \code{\link{ranef.MCMCglmm}}
+}
+
