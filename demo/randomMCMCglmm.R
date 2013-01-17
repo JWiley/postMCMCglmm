@@ -1,4 +1,5 @@
 # sample models I used as test cases for developing the code
+set.seed(1234)
 dat <- mtcars[sample(1:32, 1000, replace = TRUE), ]
 dat <- within(dat, {
   qsec <- scale(qsec)

@@ -1,4 +1,5 @@
 # sample models I used as test cases for developing the code
+set.seed(1234)
 dat <- mtcars[sample(1:32, 1000, replace = TRUE), ]
 dat <- within(dat, {
   qsec <- scale(qsec)
@@ -16,7 +17,7 @@ m.full <- MCMCglmm(cyl ~ qsec + mpg + drat, random = ~ ID, family = "ordinal",
   B = list(mu = c(0, 0, 0, 0), V = diag(4) * 1e2),
   R = list(V = 1, fix = 1),
   G = list(G1 = list(V = 1, nu = .002))), pr=TRUE,
-  nitt = 51000, thin = 20, burnin = 1000, verbose=FALSE)
+  nitt = 55000, thin = 20, burnin = 5000, verbose=FALSE)
 
 # rescale back to standard normal
 # based on 1 for standard normal plus fixed residual variance
