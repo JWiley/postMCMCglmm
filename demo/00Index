@@ -1,0 +1,4 @@
+simpleMCMCglmm  Simple demonstration of a single level ordered probit model in MCMCglmm
+randomMCMCglmm  Example of a two level hierarchical ordered probit model in MCMCglmm
+postMCMCglmm    Example of a two level hierarchical ordered probit model in MCMCglmm followed up with post estimation including predicted values for graphing and recycled probabilities
+

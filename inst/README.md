@@ -1,0 +1,1 @@
+Notes about the inst directory

@@ -57,7 +57,6 @@ confusion <- function(formula, data) {
   res/sum(res)
 }
 
-
 #' Plot the joint posterior from an MCMC
 #'
 #' A function to calculate the HPD region for a joint posterior,
@@ -89,6 +88,7 @@ confusion <- function(formula, data) {
 #'   side effect of creating a graph.
 #' @importFrom grid unit grid.newpage pushViewport viewport grid.layout
 #' @importFrom emdbook HPDregionplot
+#' @export
 #' @examples
 #' \dontrun{
 #'   # sample data

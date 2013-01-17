@@ -8,8 +8,11 @@
 #'
 #' @param object A model object to predict from
 #' @param \dots Additional arguments passed to the methods
-#' @rdname predict2
 #' @export
+#' @rdname predict2
+#' @examples
+#' # to see available methods
+#' methods(predict2)
 predict2 <- function (object, ...) {
   UseMethod("predict2", object)
 }
@@ -38,20 +41,19 @@ predict2 <- function (object, ...) {
 #' However, response is currently only implemented for ordinal (probit) models.
 #' Theoretically it could be extended but the code is a pain.
 #'
-#' @param object A \code{MCMCglmm} model object to use for prediction.
+# @param object A \code{MCMCglmm} model object to use for prediction.
 #' @param X The fixed effects design matrix. Can be the original or new data.
 #' @param Z The random effects design matrix. Can be the original or new data.
 #' @param use A character string. Use just the posterior \dQuote{mean} or
 #'   \dQuote{all} posterior samples (the default).
 #' @param type A cahracter string. Either \dQuote{lp} for the linear predictor
 #'   (the default) or \dQuote{response} for the predicted values on the response scale.
-#' @param \dots Not currently used.
+# @param \dots Not currently used.
 #' @return Either a matrix of the linear predictor if \code{type = "lp"} or a
 #'   list of class MCMCglmmPredictedProbs if \code{type = "response"}
-#' @seealso \code{\link{summary.MCMCglmmPredictedProbs}}
-#' @rdname predict2
 #' @method predict2 MCMCglmm
 #' @export
+#' @rdname predict2
 #' @seealso \code{\link{summary.MCMCglmmPredictedProbs}}, \code{\link{recycler}}
 #' @examples
 #' \dontrun{
