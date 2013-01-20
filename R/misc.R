@@ -48,6 +48,45 @@ summary.MCMCglmmPredictedProbs <- function(object,
   return(res)
 }
 
+#' Summary method for MCMCglmm predicted values
+#'
+#' If the predicted values only used the posterior means,
+#' highest posterior density (HPD) intervals cannot be generated, so only
+#' the means are returned. Otherwise, it calculates the mean predicted value,
+#' as well as the HPD interval.
+#'
+#' @param object A \code{MCMCglmmPredictedLP} object to summarize
+#' @param level A numeric value, the value to use when calculating HPD intervals. Defaults to .95.
+#' @param \dots Not currently used.
+#' @return If HPD intervals are calculated, returns a matrix
+#'   with the means, lower limit, and upper limit. If no HPD intervals
+#'   are calculated, returns a column vector of means.
+#' @method summary MCMCglmmPredictedLP
+#' @export
+#' @seealso \code{\link{predict2.MCMCglmm}}, \code{\link{recycler}}
+#' @examples
+#' \dontrun{
+#'   ## Make me!
+#' }
+summary.MCMCglmmPredictedLP <- function(object, level = .95, ...) {
+
+  if (nrow(object) > 1) {
+    intervals <- TRUE
+  } else {
+    intervals <- FALSE
+  }
+
+  if (intervals) {
+    res <- cbind(colMeans(x), HPDinterval(mcmc(x), prob = level))
+    colnames(res) <- c("M", "LL", "UL")
+  } else {
+    res <- as.matrix(colMeans(x))
+    colnames(res) <- "M"
+  }
+
+  return(res)
+}
+
 # simple little function to generate confusion matrices
 # I use it for one column predicted class, one column actual
 # then look at percentage correctly classified
@@ -56,6 +95,17 @@ confusion <- function(formula, data) {
   print(res)
   res/sum(res)
 }
+
+## as.list.matrix <- function(x, ...) {
+##   d <- dim(x)
+##   ncols <- d[2L]
+##   ic <- seq_len(ncols)
+
+##   value <- vector("list", ncols)
+##   for (i in ic) value[[i]] <- as.vector(x[, i])
+##   names(value) <- dimnames(x)[[2L]]
+##   return(value)
+## }
 
 #' Plot the joint posterior from an MCMC
 #'

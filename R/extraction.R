@@ -83,7 +83,7 @@ ranefLevels <- function(object, data, ...) {
   use <- match.arg(use)
   which <- match.arg(which)
 
-  b <- object[["Sol"]]
+  b <- as.matrix(object[["Sol"]])
 
   eff <- switch(which,
     fixed = {
@@ -97,9 +97,9 @@ ranefLevels <- function(object, data, ...) {
       object$X@Dimnames[[2]]
     },
     random = {
-      unlist(lapply(paramNamesMCMCglmm(object)$random, function(n) {
-        grep(paste0("^", n, "\\..*$"), colnames(b), value = TRUE)
-      }))
+      regex <- paste(paramNamesMCMCglmm(object)$random, collapse = "|")
+      regex <- paste0("^(", regex, ")\\..*$")
+      grep(regex, colnames(b), value = TRUE)
     }
   )
 
@@ -215,7 +215,7 @@ stdranef <- function(object, which, type = c("lp", "response")) {
   }
 
   index <- lapply(which, function(n) {
-    n <- paste(n, collapse="|")
+    n <- paste(n, collapse = "|")
     regex <- paste0("^(", n, ")\\..*$")
     index <- grep(regex, colnames(z))
     return(index)
