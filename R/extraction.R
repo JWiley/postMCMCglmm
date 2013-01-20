@@ -182,18 +182,18 @@ ranef.MCMCglmm <- function(object, use = c("all", "mean"), ...) {
 
 
 
-stdranef(m[[1]], which = list(1), type = "lp")
-stdranef(m[[1]], which = list(2), type = "lp")
-stdranef(m[[1]], which = list(1, 2, c(1, 2)), type = "lp")
-stdranef(m[[1]], type = "lp")
+## stdranef(m[[1]], which = list(1), type = "lp")
+## stdranef(m[[1]], which = list(2), type = "lp")
+## stdranef(m[[1]], which = list(1, 2, c(1, 2)), type = "lp")
+## stdranef(m[[1]], type = "lp")
 
-## error
-#junk <- stdranef(m[[1]], which = list(1, 2, 3), type = "lp")
+## ## error
+## #junk <- stdranef(m[[1]], which = list(1, 2, 3), type = "lp")
 
-stdranef(m[[1]], which = list("mrn", "pager"), type = "lp")
+## stdranef(m[[1]], which = list("mrn", "pager"), type = "lp")
 
-# this does not work, check zero setting
-junk <- stdranef(m[[1]], type = "response")
+## # this does not work, check zero setting
+## junk <- stdranef(m[[1]], type = "response")
 
 stdranef <- function(object, which, type = c("lp", "response")) {
   type <- match.arg(type)

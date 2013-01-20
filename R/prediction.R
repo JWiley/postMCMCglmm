@@ -78,35 +78,36 @@ predict2.MCMCglmm <- function(object, X, Z, use = c("all", "mean"),
 
   Xb <- Zu <- 0L
 
-  if (!is.null(X)) {
-    Xb <- X %*% as.matrix(fixef(object, use = use))
-  }
-  if (!is.null(Z)) {
-    Zu <-  Z %*% as.matrix(ranef(object, use = use))
-  }
+  b <- as.matrix(fixef(object, use = use))
+  u <- as.matrix(ranef(object, use = use))
+
+  if (!is.null(X)) Xb <- X %*% b
+  if (!is.null(Z)) Zu <-  Z %*% u
 
   res <- t(as.matrix(Xb + Zu))
+
   dimnames(res) <- list(switch(use,
     all = paste0("Rep.", 1:nrow(res)), mean = NULL), NULL)
 
   if (type == "response") {
     if (all(object$family %in% c("ordinal"))) {
       stopifnot(length(unique(object$error.term)) == 1)
-      varepsilon <- unique(object$error.term)
 
-      CP <- switch(use,
-        all = object$CP,
-        mean = colMeans(object$CP))
+      stddev <- sqrt(unique(object$error.term) + 1)
+
+      # cut points
+      CP <- object$CP
+      if (use == "mean") CP <- colMeans(CP)
 
       CP <- as.list(as.data.frame(CP))
       CP <- lapply(CP, function(x) {do.call("cbind", rep(list(x), dim(res)[2L]))})
       CP <- c(-Inf, 0, CP, Inf)
-
-      p <- function(x) {pnorm(x - res, 0, sqrt(varepsilon + 1))}
+      # difference between cuts and predicted
+      CP <- lapply(CP, `-` res)
 
       q <- vector("list", length(CP) - 2)
       for (i in 2:(length(CP) - 1)) {
-        q[[i - 1]] <- mcmc(p(CP[[i + 1]]) - p(CP[[i]]))
+        q[[i - 1]] <- mcmc(pnorm(CP[[i + 1]], 0, stddev) - pnorm(CP[[i]], 0, stddev))
       }
       q <- c(list(mcmc(1 - Reduce(`+`, q[1:(i - 1)]))), q)
       class(q) <- c("list", "MCMCglmmPredictedProbs")
@@ -117,6 +118,22 @@ predict2.MCMCglmm <- function(object, X, Z, use = c("all", "mean"),
   }
   return(res)
 }
+
+## as.list.matrix <- function(x, ...) {
+##   d <- dim(x)
+##   ncols <- d[2L]
+##   ic <- seq_len(ncols)
+
+##   value <- vector("list", ncols)
+##   for (i in ic) value[[i]] <- as.vector(x[, i])
+##   names(value) <- dimnames(x)[[2L]]
+##   return(value)
+## }
+
+## y <- list(1:10000)
+## system.time(test1 <- do.call("cbind", rep(y, 4000)))
+## system.time(test2 <- matrix(y[[1]])[, rep(1, 4000)])
+## system.time(test3 <- matrix(rep(y[[1]], 4000), ncol=4000))
 
 #' Calculate change in predicted probabilities
 #'
