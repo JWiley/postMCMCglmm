@@ -179,3 +179,76 @@ fixef.MCMCglmm <- function(object, use = c("all", "mean"), ...) {
 ranef.MCMCglmm <- function(object, use = c("all", "mean"), ...) {
   .extractEffects(object = object, use = use, which = "random", ...)
 }
+
+
+
+stdranef(m[[1]], which = list(1), type = "lp")
+stdranef(m[[1]], which = list(2), type = "lp")
+stdranef(m[[1]], which = list(1, 2, c(1, 2)), type = "lp")
+stdranef(m[[1]], type = "lp")
+
+## error
+#junk <- stdranef(m[[1]], which = list(1, 2, 3), type = "lp")
+
+stdranef(m[[1]], which = list("mrn", "pager"), type = "lp")
+
+# this does not work, check zero setting
+junk <- stdranef(m[[1]], type = "response")
+
+stdranef <- function(object, which, type = c("lp", "response")) {
+  type <- match.arg(type)
+
+  if (is.null(object$Z)) stop("Z matrix must be saved")
+  z <- object$Z
+
+  re <- paramNamesMCMCglmm(object)$random
+
+  if (missing(which)) which <- c(re, list(re))
+
+  stopifnot(is.list(which))
+
+  if (is.numeric(unlist(which))) {
+    stopifnot(all(unlist(which) %in% seq_along(re)))
+    which <- lapply(which, function(i) re[i])
+  } else {
+    stopifnot(all(unlist(which) %in% re))
+  }
+
+  index <- lapply(which, function(n) {
+    n <- paste(n, collapse="|")
+    regex <- paste0("^(", n, ")\\..*$")
+    index <- grep(regex, colnames(z))
+    return(index)
+  })
+
+  # tricky, note that coefficients and predicted probabilities
+  # do not come out with the same dimensions, the are transposed
+  # samples on columns for coefs, samples on rows for predicted probs
+  res <- switch(type,
+    lp = {
+      yhat <- lapply(index, function(i) ranef(object, use = "all")[i, ])
+      lapply(yhat, function(m) matrix(apply(m, 2, var)))
+    }, response = {
+      yhat <- lapply(index, function(i) {
+        tmp <- z
+        tmp[, -i] <- 0L # bug here??
+        predict2(object, X = NULL, Z = tmp, use = "all", type = type)
+      })
+      lapply(yhat, function(m) sapply(m, function(n) apply(n, 1, var)))
+    })
+
+  names(res) <- which
+
+  M <- do.call(rbind, lapply(res, colMeans))
+
+  finalres <- list(M = M, Data = res)
+  class(finalres) <- "postMCMCglmmRE"
+
+  return(finalres)
+}
+
+print.postMCMCglmmRE <- function(x, ...) {
+  x <- x$M
+  NextMethod(print, object = x)
+}
+

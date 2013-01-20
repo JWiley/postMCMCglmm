@@ -91,7 +91,7 @@ predict2.MCMCglmm <- function(object, X, Z, use = c("all", "mean"),
 
   if (type == "response") {
     if (all(object$family %in% c("ordinal"))) {
-      stopifnot(length(unique(object$error.term)) != 1)
+      stopifnot(length(unique(object$error.term)) == 1)
       varepsilon <- unique(object$error.term)
 
       CP <- switch(use,
@@ -154,7 +154,7 @@ recycler <- function(object, index = 2L, twiddle, values, ...) {
   if (!L1 && !L2) stop("Please specify either a twiddle value or actual values, not both")
   X1 <- X2 <- object$X
 
-  stopifnot(index %in% seq.int(ncol(X1)))
+  stopifnot(index %in% seq.int(ncol(X1)) || index %in% colnames(X1))
 
   if (L1 && L2) {
     twiddle <- .01
