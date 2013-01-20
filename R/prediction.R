@@ -56,12 +56,28 @@ predict2 <- function (object, ...) {
 #' @rdname predict2
 #' @seealso \code{\link{summary.MCMCglmmPredictedProbs}}, \code{\link{recycler}}
 #' @examples
-#' \dontrun{
-#'   ## Make me!
-#' }
+#'   \dontrun{
+#'     data(PlodiaPO)
+#'     PlodiaPO <- within(PlodiaPO, {
+#'       PO2 <- cut(PO, quantile(PO, c(0, .33, .66, 1)))
+#'     })
+#'
+#'     m <- MCMCglmm(PO2 ~ 1, random = ~ FSfamily,
+#'       family = "ordinal", data = PlodiaPO,
+#'       prior = list(
+#'         R = list(V = 1, fix = 1),
+#'         G = list(
+#'           G1 = list(V = 1, nu = .002)
+#'         )
+#'       ), verbose=FALSE, thin=1, pr=TRUE)
+#'
+#'     # predicted probabilities for each level of the outcome
+#'     # using all posterior samples
+#'     yhat <- predict2(m, use = "all", type = "response")
+#'     str(yhat) # view structure
+#'   }
 predict2.MCMCglmm <- function(object, X, Z, use = c("all", "mean"),
   type = c("lp", "response"), ...) {
-
   use <- match.arg(use)
   type <- match.arg(type)
 
@@ -78,8 +94,8 @@ predict2.MCMCglmm <- function(object, X, Z, use = c("all", "mean"),
 
   Xb <- Zu <- 0L
 
-  b <- as.matrix(fixef(object, use = use))
-  u <- as.matrix(ranef(object, use = use))
+  b <- fixef(object, use = use)
+  u <- ranef(object, use = use)
 
   if (!is.null(X)) Xb <- X %*% b
   if (!is.null(Z)) Zu <-  Z %*% u
@@ -100,14 +116,19 @@ predict2.MCMCglmm <- function(object, X, Z, use = c("all", "mean"),
       if (use == "mean") CP <- colMeans(CP)
 
       CP <- as.list(as.data.frame(CP))
-      CP <- lapply(CP, function(x) {do.call("cbind", rep(list(x), dim(res)[2L]))})
-      CP <- c(-Inf, 0, CP, Inf)
-      # difference between cuts and predicted
-      CP <- lapply(CP, `-` res)
+      CP <- c(0, lapply(CP, function(x) {
+        do.call("cbind", rep(list(x), dim(res)[2L]))
+      }))
+      # difference between cuts and predicted plus lower and upper bounds
+      for (i in seq_along(CP)) {
+        CP[[i]] <- pnorm(CP[[i]] - res, 0, stddev)
+      }
+
+      CP <- c(0, CP, 1)
 
       q <- vector("list", length(CP) - 2)
       for (i in 2:(length(CP) - 1)) {
-        q[[i - 1]] <- mcmc(pnorm(CP[[i + 1]], 0, stddev) - pnorm(CP[[i]], 0, stddev))
+        q[[i - 1]] <- mcmc(CP[[i + 1]] - CP[[i]])
       }
       q <- c(list(mcmc(1 - Reduce(`+`, q[1:(i - 1)]))), q)
       class(q) <- c("list", "MCMCglmmPredictedProbs")
@@ -115,25 +136,13 @@ predict2.MCMCglmm <- function(object, X, Z, use = c("all", "mean"),
     } else {
       stop("Function does not support response type for families beside ordinal")
     }
+  } else if (type == "lp") {
+    res <- as.mcmc(res)
+    class(res) <- c("mcmc", "MCMCglmmPredictedLP")
   }
+
   return(res)
 }
-
-## as.list.matrix <- function(x, ...) {
-##   d <- dim(x)
-##   ncols <- d[2L]
-##   ic <- seq_len(ncols)
-
-##   value <- vector("list", ncols)
-##   for (i in ic) value[[i]] <- as.vector(x[, i])
-##   names(value) <- dimnames(x)[[2L]]
-##   return(value)
-## }
-
-## y <- list(1:10000)
-## system.time(test1 <- do.call("cbind", rep(y, 4000)))
-## system.time(test2 <- matrix(y[[1]])[, rep(1, 4000)])
-## system.time(test3 <- matrix(rep(y[[1]], 4000), ncol=4000))
 
 #' Calculate change in predicted probabilities
 #'
