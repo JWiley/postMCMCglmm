@@ -12,7 +12,7 @@ dat$cyl <- factor(dat$cyl)
 
 # estimate model
 set.seed(10)
-m.simple <- MCMCglmm(cyl ~ qsec, family = "ordinal",
+m <- MCMCglmm(cyl ~ qsec, family = "ordinal",
   data = dat, prior = list(
   B = list(mu = c(0, 0), V = diag(2) * 1e10),
   R = list(V = 1, fix = 1)),
@@ -20,6 +20,7 @@ m.simple <- MCMCglmm(cyl ~ qsec, family = "ordinal",
 
 # rescale back to standard normal
 # based on 1 for standard normal plus fixed residual variance
+m.simple <- m
 m.simple$Sol <- m.simple$Sol/sqrt(1 + 1)
 m.simple$CP <- m.simple$CP/sqrt(1 + 1)
 m.simple$VCV <- m.simple$VCV / 2
@@ -29,5 +30,7 @@ malt <- MASS::polr(cyl ~ qsec, data = dat, method = "probit", Hess=TRUE)
 
 
 # compare Bayesian to classical estimates
+# note MCMCglmm uses an intercept + cutpoint
+# whereas polr uses two thresholds
 summary(m.simple)
 summary(malt)

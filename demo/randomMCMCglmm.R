@@ -12,7 +12,7 @@ dat$cyl <- factor(dat$cyl)
 
 # set seed and estimate model
 set.seed(10)
-m.random <- MCMCglmm(dv4 ~ hp, random = ~ ID, family = "ordinal",
+m <- MCMCglmm(cyl ~ hp, random = ~ ID, family = "ordinal",
   data = dat, prior = list(
   B = list(mu = c(0, 0), V = diag(2) * 1e10),
   R = list(V = 1, fix = 1),
@@ -21,6 +21,10 @@ m.random <- MCMCglmm(dv4 ~ hp, random = ~ ID, family = "ordinal",
 
 # rescale back to standard normal
 # based on 1 for standard normal plus fixed residual variance
+m.random <- m
 m.random$Sol <- m.random$Sol/sqrt(1 + 1)
 m.random$CP <- m.random$CP/sqrt(1 + 1)
 m.random$VCV <- m.random$VCV / 2
+
+# view a summary
+summary(m.random)

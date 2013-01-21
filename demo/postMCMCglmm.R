@@ -12,21 +12,23 @@ dat$cyl <- factor(dat$cyl)
 
 # set seed and estimate model
 set.seed(10)
-m.full <- MCMCglmm(cyl ~ qsec + mpg + drat, random = ~ ID, family = "ordinal",
+m <- MCMCglmm(cyl ~ qsec + mpg + drat, random = ~ ID, family = "ordinal",
   data = dat, prior = list(
   B = list(mu = c(0, 0, 0, 0), V = diag(4) * 1e2),
   R = list(V = 1, fix = 1),
   G = list(G1 = list(V = 1, nu = .002))), pr=TRUE,
   nitt = 55000, thin = 20, burnin = 5000, verbose=FALSE)
 
-# rescale back to standard normal
+# rescale back to standard normal (in a copy of the model object)
 # based on 1 for standard normal plus fixed residual variance
+m.full <- m
 m.full$Sol <- m.full$Sol/sqrt(1 + 1)
 m.full$CP <- m.full$CP/sqrt(1 + 1)
 m.full$VCV <- m.full$VCV / 2
 
 
-## model summary
+## rescaled model summary
+## note we do not use the rescaled model for predictions
 summary(m.full)
 
 ## predictor means
@@ -35,17 +37,22 @@ colMeans(dat[, c("qsec", "mpg", "drat")])
 lapply(dat[, c("qsec", "mpg", "drat")], range)
 
 ## new data for prediction
-myX <- as.matrix(data.frame("(Intercept)" = 1, qsec = 0, mpg = 0, drat = seq(from = 2.76, to = 4.93, by = .1), check.names=FALSE))
+myX <- as.matrix(data.frame(
+  "(Intercept)" = 1, qsec = 0, mpg = 0,
+  drat = seq(from = 2.76, to = 4.93, by = .1),
+  check.names=FALSE))
 
 ## get the predicted values (fixed effects only)
-pred1 <- predict2(m.full, X = myX, Z = NULL, use = "all", type = "response", varepsilon = 1)
+pred1 <- predict2(m, X = myX, Z = NULL, use = "all", type = "response")
 
 ## summarize them
 (spred1 <- summary(pred1))
 
 ## can combine predicted probs + HPD intervals with prediction data
 ## to be able to plot
-preddat <- as.data.frame(cbind(do.call(rbind, rep(list(myX), 3)), do.call(rbind, spred1)))
+preddat <- as.data.frame(cbind(do.call(rbind, rep(list(myX), 3)),
+  do.call(rbind, spred1)))
+
 ## need an indicator for which level of the outcome
 preddat$outcome <- factor(rep(1:3, each = nrow(myX)))
 
