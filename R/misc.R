@@ -77,10 +77,10 @@ summary.MCMCglmmPredictedLP <- function(object, level = .95, ...) {
   }
 
   if (intervals) {
-    res <- cbind(colMeans(x), HPDinterval(mcmc(x), prob = level))
+    res <- cbind(colMeans(object), HPDinterval(mcmc(object), prob = level))
     colnames(res) <- c("M", "LL", "UL")
   } else {
-    res <- as.matrix(colMeans(x))
+    res <- as.matrix(colMeans(object))
     colnames(res) <- "M"
   }
 
