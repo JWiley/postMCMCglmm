@@ -75,6 +75,25 @@ predict2 <- function (object, ...) {
 #'     # using all posterior samples
 #'     yhat <- predict2(m, use = "all", type = "response")
 #'     str(yhat) # view structure
+#'
+#'     # summary of predicted probabilities
+#'     sumyhat <- summary(yhat)
+#'     # first few summaries for level 1
+#'     head(sumyhat[[1]])
+#'
+#'     # first few summaries for level 2
+#'     head(sumyhat[[2]])
+#'
+#'     # first few summaries for level 3
+#'     head(sumyhat[[3]])
+#'
+#'     # combine
+#'     longsum <- do.call(rbind.data.frame, sumyhat)
+#'     # create a level indicator
+#'     longsum$Level <- factor(rep(1:3, each = nrow(sumyhat[[1]])))
+#'
+#'     # plot
+#'     boxplot(M ~ Level, data = longsum)
 #'   }
 predict2.MCMCglmm <- function(object, X, Z, use = c("all", "mean"),
   type = c("lp", "response"), ...) {

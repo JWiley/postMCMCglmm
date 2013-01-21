@@ -181,21 +181,67 @@ ranef.MCMCglmm <- function(object, use = c("all", "mean"), ...) {
 }
 
 
-
-## stdranef(m[[1]], which = list(1), type = "lp")
-## stdranef(m[[1]], which = list(2), type = "lp")
-## stdranef(m[[1]], which = list(1, 2, c(1, 2)), type = "lp")
-## stdranef(m[[1]], type = "lp")
-
-## ## error
-## #junk <- stdranef(m[[1]], which = list(1, 2, 3), type = "lp")
-
-## stdranef(m[[1]], which = list("mrn", "pager"), type = "lp")
-
-## # this does not work, check zero setting
-## junk <- stdranef(m[[1]], type = "response")
-
-stdranef <- function(object, which, type = c("lp", "response")) {
+#' Extract standard deviation of "random" effects from an \code{MCMCglmm} object
+#'
+#' Function designed to extract the standard deviation of the
+#' random effects from an \code{MCMCglmm} model object.
+#' Note that this is not the same as the posterior distribution of
+#' (co)variance matrices. It is based on the posterior distribution
+#' of the random effects. This also means it requires \code{pr=TRUE}
+#' to be set in the model for the information to be saved. Can optionally
+#' return standard deviation of random effects after back transforming to
+#' the response metric. Currently probabilities, but only for ordinal family
+#' models (\code{family="ordinal"}).
+#'
+#' @param object An \code{MCMCglmm} model object to extract the effects from
+#' @param which A list of random effects to extract or their numeric positions
+#'   If there are two numbers in a list, effects are simulataneous.
+#' @param type A chacter string indicating whether to calculate the standard
+#'   deviation on the linear predictor metric, \sQuote{lp} or
+#'   response, \sQuote{response}.
+#' @param \dots Not currently used.
+#' @return A list of class postMCMCglmmRE with individual estimates and means
+#' @export
+#' @seealso \code{\link{print.postMCMCglmmRE}}, \code{\link{predict2.MCMCglmm}}, \code{\link{ranef.MCMCglmm}}
+#' @examples
+#' \dontrun{
+#'   # a simple MCMCglmm model
+#'   data(PlodiaPO)
+#'   PlodiaPO <- within(PlodiaPO, {
+#'     PO2 <- cut(PO, quantile(PO, c(0, .33, .66, 1)))
+#'     plate <- factor(plate)
+#'   })
+#'
+#'   m <- MCMCglmm(PO2 ~ 1, random = ~ FSfamily + plate,
+#'     family = "ordinal", data = PlodiaPO,
+#'     prior = list(
+#'       R = list(V = 1, fix = 1),
+#'       G = list(
+#'         G1 = list(V = 1, nu = .002),
+#'         G2 = list(V = 1, nu = .002)
+#'       )
+#'     ), verbose=FALSE, thin=1, pr=TRUE)
+#'
+#'   # summary of the model
+#'   summary(m)
+#'
+#'   # examples of extracting standard deviations of
+#'   # different random effects on the linear predictor metric
+#'   # or after transformation to probabilities (only for ordinal)
+#'   stdranef(m, which = list(1), type = "lp")
+#'   stdranef(m, which = list(2), type = "lp")
+#'   stdranef(m, which = list(1, 2, c(1, 2)), type = "lp")
+#'   stdranef(m, type = "lp")
+#'
+#'   ## error because no 3rd random effect
+#'   #stdranef(m, which = list(1, 2, 3), type = "lp")
+#'
+#'   stdranef(m, which = list("FSfamily", "plate"), type = "lp")
+#'
+#'   # this does not work, check zero setting
+#'   #stdranef(m, type = "response")
+#' }
+stdranef <- function(object, which, type = c("lp", "response"), ...) {
   type <- match.arg(type)
 
   if (is.null(object$Z)) stop("Z matrix must be saved")
@@ -227,14 +273,14 @@ stdranef <- function(object, which, type = c("lp", "response")) {
   res <- switch(type,
     lp = {
       yhat <- lapply(index, function(i) ranef(object, use = "all")[i, ])
-      lapply(yhat, function(m) matrix(apply(m, 2, var)))
+      lapply(yhat, function(m) matrix(apply(m, 2, sd)))
     }, response = {
       yhat <- lapply(index, function(i) {
         tmp <- z
         tmp[, -i] <- 0L # bug here??
         predict2(object, X = NULL, Z = tmp, use = "all", type = type)
       })
-      lapply(yhat, function(m) sapply(m, function(n) apply(n, 1, var)))
+      lapply(yhat, function(m) sapply(m, function(n) apply(n, 1, sd)))
     })
 
   names(res) <- which
@@ -246,9 +292,3 @@ stdranef <- function(object, which, type = c("lp", "response")) {
 
   return(finalres)
 }
-
-print.postMCMCglmmRE <- function(x, ...) {
-  x <- x$M
-  NextMethod(print, object = x)
-}
-

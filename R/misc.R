@@ -87,6 +87,23 @@ summary.MCMCglmmPredictedLP <- function(object, level = .95, ...) {
   return(res)
 }
 
+#' Print method for extracted random effects (as standard deviations) from a MCMCglmm object
+#'
+#' @param x An \code{postMCMCglmmRE} object
+#' @param \dots Not currently used.
+#' @return Nothing. Prints to console.
+#' @method print postMCMCglmmRE
+#' @export
+#' @seealso \code{\link{stdranef}}
+#' @examples
+#' \dontrun{
+#'   # make me!!!
+#' }
+print.postMCMCglmmRE <- function(x, ...) {
+  x <- x$M
+  NextMethod(print, object = x)
+}
+
 # simple little function to generate confusion matrices
 # I use it for one column predicted class, one column actual
 # then look at percentage correctly classified
