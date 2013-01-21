@@ -70,8 +70,44 @@
 # to see available methods
 methods(predict2)
 \dontrun{
-  ## Make me!
-}
+    data(PlodiaPO)
+    PlodiaPO <- within(PlodiaPO, {
+      PO2 <- cut(PO, quantile(PO, c(0, .33, .66, 1)))
+    })
+
+    m <- MCMCglmm(PO2 ~ 1, random = ~ FSfamily,
+      family = "ordinal", data = PlodiaPO,
+      prior = list(
+        R = list(V = 1, fix = 1),
+        G = list(
+          G1 = list(V = 1, nu = .002)
+        )
+      ), verbose=FALSE, thin=1, pr=TRUE)
+
+    # predicted probabilities for each level of the outcome
+    # using all posterior samples
+    yhat <- predict2(m, use = "all", type = "response")
+    str(yhat) # view structure
+
+    # summary of predicted probabilities
+    sumyhat <- summary(yhat)
+    # first few summaries for level 1
+    head(sumyhat[[1]])
+
+    # first few summaries for level 2
+    head(sumyhat[[2]])
+
+    # first few summaries for level 3
+    head(sumyhat[[3]])
+
+    # combine
+    longsum <- do.call(rbind.data.frame, sumyhat)
+    # create a level indicator
+    longsum$Level <- factor(rep(1:3, each = nrow(sumyhat[[1]])))
+
+    # plot
+    boxplot(M ~ Level, data = longsum)
+  }
 }
 \seealso{
   \code{\link{summary.MCMCglmmPredictedProbs}},
