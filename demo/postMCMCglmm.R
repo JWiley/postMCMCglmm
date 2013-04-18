@@ -93,3 +93,8 @@ finaltable
 
 ## write to clipboard on Windows (e.g., for collaborators who want in Excel)
 #write.table(finaltable, file = "clipboard", na = "", sep = "\t", row.names=FALSE, col.names=TRUE)
+
+## now look at the average standard deviation of the distribution of predicted
+## probabilities including the random effects, given a fixed effect
+## probability of .5 see ?stdranef for more details
+stdranef(m, type = "response")

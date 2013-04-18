@@ -1,7 +1,7 @@
 Package: postMCMCglmm
 Type: Package
-Version: 0.1-1
-Date: 2013-1-30
+Version: 0.1-2
+Date: 2013-4-17
 Title: Average marginal predicted probabilities from Bayesian ordered
     probit models
 Author: Joshua Wiley <jwiley.psych@gmail.com>

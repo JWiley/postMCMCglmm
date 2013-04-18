@@ -200,7 +200,7 @@ ranef.MCMCglmm <- function(object, use = c("all", "mean"), ...) {
 #'   deviation on the linear predictor metric, \sQuote{lp} or
 #'   response, \sQuote{response}.
 #' @param \dots Not currently used.
-#' @return A list of class postMCMCglmmRE with individual estimates and means
+#' @return A list of class postMCMCglmmRE with means (\code{M}) and individual estimates (\code{Data})
 #' @export
 #' @seealso \code{\link{print.postMCMCglmmRE}}, \code{\link{predict2.MCMCglmm}}, \code{\link{ranef.MCMCglmm}}
 #' @examples
@@ -238,14 +238,19 @@ ranef.MCMCglmm <- function(object, use = c("all", "mean"), ...) {
 #'
 #'   stdranef(m, which = list("FSfamily", "plate"), type = "lp")
 #'
-#'   # this does not work, check zero setting
-#'   #stdranef(m, type = "response")
+#'   # mean standard deviations on the probability metric
+#'   # also the full distributions, if desired in the Data slot.
+#'   res <- stdranef(m, type = "response")
+#'   res$M # means
+#'   hist(res$Data$FSfamily[, 1]) # histogram
 #' }
 stdranef <- function(object, which, type = c("lp", "response"), ...) {
   type <- match.arg(type)
 
   if (is.null(object$Z)) stop("Z matrix must be saved")
-  z <- object$Z
+  ## z <- object$Z
+  z <- diag(ncol(object$Z))
+  colnames(z) <- colnames(object$Z)
 
   re <- paramNamesMCMCglmm(object)$random
 
@@ -277,7 +282,9 @@ stdranef <- function(object, which, type = c("lp", "response"), ...) {
     }, response = {
       yhat <- lapply(index, function(i) {
         tmp <- z
-        tmp[, -i] <- 0L # bug here??
+        if (length(i) < ncol(tmp)) {
+          tmp[, -i] <- 0L # zero out all random effects we are not interested in
+        }
         predict2(object, X = NULL, Z = tmp, use = "all", type = type)
       })
       lapply(yhat, function(m) sapply(m, function(n) apply(n, 1, sd)))

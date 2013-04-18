@@ -19,8 +19,8 @@
   \item{\dots}{Not currently used.}
 }
 \value{
-  A list of class postMCMCglmmRE with individual estimates
-  and means
+  A list of class postMCMCglmmRE with means (\code{M}) and
+  individual estimates (\code{Data})
 }
 \description{
   Function designed to extract the standard deviation of
@@ -70,8 +70,11 @@
 
   stdranef(m, which = list("FSfamily", "plate"), type = "lp")
 
-  # this does not work, check zero setting
-  #stdranef(m, type = "response")
+  # mean standard deviations on the probability metric
+  # also the full distributions, if desired in the Data slot.
+  res <- stdranef(m, type = "response")
+  res$M # means
+  hist(res$Data$FSfamily[, 1]) # histogram
 }
 }
 \seealso{
