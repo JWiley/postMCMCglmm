@@ -12,7 +12,7 @@ Installation
 #install.packages("devtools")
 require(devtools)
 
-install_github("postMCMCglmm", "JWiley")
+install_github("JWiley/postMCMCglmm")
 ```
 
 Citation
