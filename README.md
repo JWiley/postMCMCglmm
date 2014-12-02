@@ -18,7 +18,7 @@ install_github("JWiley/postMCMCglmm")
 Citation
 --------
 
-  Joshua Wiley (2013). postMCMCglmm: Average marginal predicted
+  Joshua F. Wiley (2013). postMCMCglmm: Average marginal predicted
   probabilities from Bayesian ordered probit models. R package version
   0.1-2. doi: 10.5281/zenodo.11461.
 
