@@ -152,6 +152,14 @@ predict2.MCMCglmm <- function(object, X, Z, use = c("all", "mean"),
       q <- c(list(mcmc(1 - Reduce(`+`, q[1:(i - 1)]))), q)
       class(q) <- c("list", "MCMCglmmPredictedProbs")
       res <- q
+    } else if (all(object$family %in% c("categorical", "multinomial"))) {
+
+      # stopifnot(length(unique(object$error.term)) == 1)
+      k <- ((16*sqrt(3))/(15*pi))^2  # this should be the scaling constant for logit
+      stddev <- sqrt(object$error.term + k) # check that this is right error
+      q <- plogis(res)
+      class(q) <- c("MCMCglmmPredictedProbs")
+      res <- q
     } else {
       stop("Function does not support response type for families beside ordinal")
     }
